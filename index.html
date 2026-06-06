@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1024">
+    <title>BSNL Letter Generator</title>
+    <!--
+    ═══════════════════════════════════════════════════════════════════════════════════
+    BSNL APPOINTMENT LETTER PDF GENERATOR - PRODUCTION GRADE
+    ═══════════════════════════════════════════════════════════════════════════════════
+    
+    CRITICAL PDF RENDERING OPTIMIZATIONS:
+    ✓ Watermark Logo: Proper opacity (0.08), absolute positioning, crisp rendering
+    ✓ Text Rendering: Sharp, black (#000), optimizeLegibility, no fading
+    ✓ Stamp Quality: High-res PNG handling, 0.92 opacity, high-quality image rendering
+    ✓ Image Handling: Preloading, eager loading, syncDecoding, CORS safe
+    ✓ Print CSS: -webkit-print-color-adjust: exact on all elements
+    ✓ Background: Colors and images preserved in PDF export
+    ✓ Font Rendering: Times New Roman, antialiased, optimized for printing
+    
+    PDF EXPORT SETTINGS (User must enable in browser):
+    - Background graphics: ON
+    - Margins: None (0mm)
+    - Scale: 100%
+    - Paper: A4
+    - Color: Preserve exact colors
+    ═══════════════════════════════════════════════════════════════════════════════════
+    -->
+    <style>
+        :root {
+            --primary: #003399;
+            /* BSNL Blue */
+            --secondary: #ffcc00;
+        }
+
+        @media print {
+
+            .no-print,
+            .dashboard-overlay {
+                display: none !important;
+            }
+
+            @page {
+                size: A4;
+                margin: 0;
+                orphans: 0;
+                widows: 0;
+            }
+
+            .page-container {
+                page-break-after: avoid;
+                page-break-inside: avoid;
+                margin: 0 !important;
+                padding: 10mm 15mm 38mm 15mm !important;
+                border: none !important;
+                box-shadow: none !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                background: white !important;
+            }
+
+            .page-container:not(:last-child) {
+                page-break-after: always;
+            }
+
+            body {
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
+            #letters-wrapper {
+                display: block !important;
+                background: white !important;
+                padding: 0 !important;
+            }
+
+            .watermark {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
+            .seal-container,
+            .seal-container img {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
+            img {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+
+        #letters-pool {
+            width: 210mm;
+            margin: 0 auto;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        /* CRITICAL safety for 210mm width */
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background: #f4f7fa;
+            margin: 0;
+            padding: 0;
+            color: #000;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ── HEADER BAR --- */
+        .header-bar {
+            background: var(--primary);
+            color: white;
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .brand-text {
+            font-weight: 800;
+            font-size: 1.5rem;
+        }
+
+        .brand-text span {
+            color: var(--secondary);
+            font-style: italic;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .csv-box {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            padding: 5px 12px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+
+        .export-pdf-btn {
+            background: var(--secondary);
+            color: #000;
+            border: none;
+            padding: 10px 25px;
+            font-weight: 800;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 12px rgba(255, 204, 0, 0.4);
+        }
+
+        .export-pdf-btn:hover {
+            background: #ffd633;
+            transform: scale(1.02);
+        }
+
+        .hero-banner {
+            padding: 60px 10%;
+            text-align: center;
+            background: linear-gradient(145deg, #003399 0%, #001a4d 100%);
+            color: white;
+            border-bottom-left-radius: 80px;
+            border-bottom-right-radius: 80px;
+            margin-bottom: 50px;
+        }
+
+        .hero-banner h2 {
+            font-size: 3.2rem;
+            margin: 0;
+            font-weight: 800;
+        }
+
+        .hero-banner p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-top: 15px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            padding: 0 8%;
+            max-width: 1400px;
+            margin: -80px auto 40px auto;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border-top: 8px solid var(--primary);
+        }
+
+        /* ── TABLE PRINT OPTIMIZATION ── */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-family: 'Times New Roman', Times, serif;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        table tr,
+        table td,
+        table th {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        table td,
+        table th {
+            border: 1px solid #000;
+            padding: 6px;
+            text-align: left;
+        }
+
+        #letters-wrapper {
+            display: block;
+            padding: 0;
+            background: #cbd5e1;
+            min-height: calc(100vh - 100px);
+        }
+
+        @media screen and (max-width: 900px) {
+            .page-container {
+                margin: 0 auto !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                padding: 14mm 18mm 0 18mm !important;
+                transform: none !important;
+            }
+        }
+
+        /* Processing Label */
+        #loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 51, 153, 0.9);
+            z-index: 9999;
+            color: white;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--secondary);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* --- STRICT A4 FRAME (3-Page Per Candidate) --- */
+        .page-container {
+            width: 210mm;
+            height: 297mm;
+            overflow: hidden;
+            padding: 10mm 15mm 38mm 15mm;
+            position: relative;
+            box-sizing: border-box;
+            background: white;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #000;
+            box-shadow: 0 2px 18px rgba(0, 0, 0, 0.13);
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            page-break-inside: avoid;
+            break-inside: avoid;
+            break-after: page;
+        }
+
+        .page-container:not(:last-child) {
+            page-break-after: always;
+        }
+
+        .page-container * {
+            box-sizing: border-box;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* Watermark — strictly behind all content - PDF OPTIMIZED */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 280px;
+            height: auto;
+            opacity: 0.15;
+            z-index: 0;
+            pointer-events: none;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            color-adjust: exact;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+        }
+
+        /* Content wrapper — sits above watermark */
+        .page-content {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .page-container p {
+            width: 100%;
+            text-align: justify;
+            margin: 0 0 7px 0;
+            position: relative;
+            z-index: 2;
+            color: #000;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* ── HEADER ── */
+        .doc-header {
+            display: grid;
+            grid-template-columns: 85px 1fr;
+            align-items: center;
+            gap: 18px;
+            border-bottom: 3px solid var(--primary);
+            padding: 12px 0 10px 0;
+            margin-bottom: 12px;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+            flex-shrink: 0;
+            background: linear-gradient(to right, rgba(0, 51, 153, 0.02), transparent);
+        }
+
+        .bsnl-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bsnl-logo img {
+            height: 80px;
+            width: auto;
+            object-fit: contain;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            color-adjust: exact;
+            image-rendering: high-quality;
+            image-rendering: crisp-edges;
+            filter: drop-shadow(0 2px 4px rgba(0, 51, 153, 0.12));
+        }
+
+        .unit-details {
+            text-align: center;
+        }
+
+        .unit-details h1 {
+            margin: 0;
+            font-size: 16pt;
+            font-weight: 900;
+            color: #003399;
+            line-height: 1.15;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-family: 'Times New Roman', Times, serif;
+            text-rendering: optimizeLegibility;
+            text-shadow: 0 1px 2px rgba(0, 51, 153, 0.05);
+        }
+
+        .unit-details h2 {
+            margin: 4px 0 0 0;
+            font-size: 10.5pt;
+            font-weight: 800;
+            color: #003399;
+            letter-spacing: 0.4px;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .gov-label {
+            display: block;
+            margin-top: 2px;
+            font-size: 8.5pt;
+            font-weight: 700;
+            color: #003399;
+            font-family: 'Times New Roman', Times, serif;
+            letter-spacing: 0.2px;
+        }
+
+        .gov-sub-label {
+            display: block;
+            margin-top: 3px;
+            font-size: 8pt;
+            font-weight: 800;
+            letter-spacing: 0.7px;
+            color: #003399;
+            text-transform: uppercase;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        /* ── SIGNATURE ROW — Flex, space-between, aligned at bottom ── */
+        .signature-grid {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: auto;
+            padding-bottom: 0;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+            flex-shrink: 0;
+        }
+
+        .sig-col {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        /* Left col – For BSNL (stamp above signatory label) */
+        .sig-col-left {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .sig-col-left .sig-header-text {
+            font-weight: 700;
+            font-size: 10pt;
+            color: #000;
+            font-family: 'Times New Roman', Times, serif;
+            margin-bottom: 4px;
+        }
+
+        /* Stamp container — exactly 100px tall */
+        .stamp-wrap {
+            height: 115px;
+            width: auto;
+            margin-bottom: -10px;
+            position: relative;
+            z-index: 5;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .stamp-wrap img {
+            height: 110px;
+            width: 110px;
+            object-fit: contain;
+            opacity: 1;
+            filter: contrast(1.1) saturate(1.15) brightness(1.02);
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .sig-authority-label {
+            font-size: 10pt;
+            font-weight: 700;
+            color: #000;
+            font-family: 'Times New Roman', Times, serif;
+            padding-top: 4px;
+            width: 200px;
+            display: block;
+            margin-top: 6px;
+        }
+
+        /* Right col – Employee (clean blank space only) */
+        .sig-col-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        /* 80px blank space for physical signature */
+        .emp-blank-space {
+            height: 80px;
+            width: 200px;
+        }
+
+        .emp-sig-label {
+            font-size: 10pt;
+            font-weight: 700;
+            color: #000;
+            font-family: 'Times New Roman', Times, serif;
+            padding-top: 4px;
+            width: 200px;
+            display: block;
+            margin-top: 4px;
+        }
+
+        /* ── META / REF LINE ── */
+        .meta-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10.5pt;
+            margin-bottom: 8px;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+            flex-shrink: 0;
+            color: #000;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        /* ── FOOTER — Absolute pinned at bottom ── */
+        footer {
+            position: absolute;
+            bottom: 10mm;
+            left: 0;
+            right: 0;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+            font-size: 9pt;
+            text-align: center;
+            color: #000;
+            background: white;
+            z-index: 10;
+            font-family: 'Times New Roman', Times, serif;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        footer strong {
+            display: block;
+            color: #000;
+            font-size: 9pt;
+            margin-bottom: 2px;
+            font-weight: 700;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        footer span {
+            display: block;
+            color: #000;
+            font-size: 8pt;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        /* ── IMAGE RENDERING OPTIMIZATION FOR PDF ── */
+        img {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+            image-rendering: high-quality !important;
+            image-rendering: crisp-edges !important;
+            image-rendering: pixelated !important;
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Prevent filter degradation in PDF */
+        .page-container img {
+            filter: none !important;
+        }
+
+        /* Ensure text renders sharply */
+        * {
+            -webkit-font-smoothing: antialiased !important;
+            -moz-osx-font-smoothing: grayscale !important;
+            text-rendering: optimizeLegibility !important;
+        }
+
+        /* ── CRITICAL: TEXT RENDERING FOR PDF ── */
+        .page-container p,
+        .page-container h1,
+        .page-container h2,
+        .page-container span,
+        .page-container div,
+        .page-container table,
+        .page-container td,
+        .page-container th {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+            color: #000 !important;
+            background-clip: border-box !important;
+        }
+
+        /* Prevent text from becoming faded in print */
+        @media print {
+            .page-container {
+                color: #000 !important;
+                background: white !important;
+            }
+
+            .page-container * {
+                color: inherit !important;
+            }
+
+            p,
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6,
+            span,
+            div,
+            td,
+            th {
+                color: #000 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !import ant;
+            }
+
+            /* Ensure watermark renders properly */
+            .watermark {
+                opacity: 0.15 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* High-quality stamp rendering */
+            .seal-container {
+                border-color: #003399 !important;
+                background: white !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .seal-container img {
+                opacity: 0.92 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+
+        /* ── SINGLE ENTRY FORM ── */
+        .single-form-panel {
+            max-width: 700px;
+            margin: 0 auto 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.13);
+            overflow: hidden;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .single-form-header {
+            background: linear-gradient(135deg, #003399 0%, #001a66 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .single-form-header .sfh-icon {
+            font-size: 2rem;
+        }
+
+        .single-form-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 800;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .single-form-header p {
+            margin: 3px 0 0 0;
+            font-size: 0.85rem;
+            opacity: 0.85;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .single-form-body {
+            padding: 28px;
+        }
+
+        .form-section-title {
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #003399;
+            border-bottom: 2px solid #e8edf8;
+            padding-bottom: 6px;
+            margin: 20px 0 14px 0;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .form-section-title:first-child {
+            margin-top: 0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .form-grid.full {
+            grid-template-columns: 1fr;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .single-form-body {
+                padding: 18px;
+            }
+
+            .single-form-header {
+                padding: 18px;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #444;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .form-group input {
+            border: 2px solid #dde3f0;
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 1rem;
+            font-family: 'Times New Roman', Times, serif;
+            color: #000;
+            background: #f8faff;
+            transition: border-color 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #003399;
+            background: white;
+        }
+
+        .salary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .salary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .ctc-preview {
+            background: linear-gradient(135deg, #f0f4ff, #e8eeff);
+            border: 2px solid #c5d0f0;
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-top: 14px;
+        }
+
+        .ctc-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            padding: 3px 0;
+            font-family: 'Times New Roman', Times, serif;
+            color: #000;
+        }
+
+        .ctc-row.total {
+            border-top: 2px solid #a0b0e0;
+            margin-top: 8px;
+            padding-top: 8px;
+            font-weight: 900;
+            font-size: 1rem;
+            color: #003399;
+        }
+
+        .generate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #003399, #0044cc);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 22px;
+            font-family: 'Times New Roman', Times, serif;
+            letter-spacing: 0.5px;
+            box-shadow: 0 6px 20px rgba(0, 51, 153, 0.35);
+            transition: 0.25s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .generate-btn:hover,
+        .generate-btn:active {
+            background: linear-gradient(135deg, #002277, #003399);
+            transform: scale(1.01);
+        }
+
+        .alt-divider {
+            text-align: center;
+            margin: 10px 0 28px 0;
+            position: relative;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .alt-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 5%;
+            right: 5%;
+            height: 1px;
+            background: #c8d3ec;
+        }
+
+        .alt-divider span {
+            background: #cbd5e1;
+            padding: 0 16px;
+            color: #555;
+            font-size: 0.85rem;
+            font-weight: 700;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header-bar no-print">
+        <div class="brand-text">BSNL Batch <span>PRO</span></div>
+        <div class="control-group">
+            <div class="csv-box">
+                <input type="file" id="csvFile"
+                    accept=".csv,text/csv,text/plain,application/csv,application/vnd.ms-excel"
+                    onchange="handleFileSelect(event)">
+            </div>
+            <button class="export-pdf-btn" onclick="optimizedPrint()">Export High-End PDF</button>
+        </div>
+    </div>
+
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <div style="font-size: 1.5rem; font-weight: 800;">Processing...</div>
+        <p>Generating your professional letters</p>
+    </div>
+
+    <div id="dashboard-overlay" class="no-print">
+        <div class="hero-banner">
+            <h2>Institutional Production</h2>
+            <p>Ready to generate professional BSNL letters with perfect A4 alignment.</p>
+        </div>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <span class="icon" style="font-size: 3rem; display: block; margin-bottom: 20px;">📋</span>
+                <h3>Prepare CSV</h3>
+                <p>Ensure your CSV headers match the portal schema (Full_Name, Ref_No, Basic...).</p>
+            </div>
+            <div class="feature-card">
+                <span class="icon" style="font-size: 3rem; display: block; margin-bottom: 20px;">✨</span>
+                <h3>Instant Render</h3>
+                <p>Every row is rendered as a 3-page set in real-time for immediate quality control.</p>
+            </div>
+            <div class="feature-card" style="border-top-color: var(--secondary);">
+                <span class="icon" style="font-size: 3rem; display: block; margin-bottom: 20px;">✅</span>
+                <h3>Perfect A4</h3>
+                <p>Strict dimensions and absolute footers guarantee zero spillover.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── SINGLE CANDIDATE ENTRY FORM ── -->
+    <div id="single-entry-section" class="no-print" style="padding: 0 20px;">
+        <div class="alt-divider"><span>— Or Enter a Single Candidate —</span></div>
+        <div class="single-form-panel">
+            <div class="single-form-header">
+                <span class="sfh-icon">📝</span>
+                <div>
+                    <h3>Single Candidate Entry</h3>
+                    <p>Fill the form below — no Excel/CSV needed. Works perfectly on mobile.</p>
+                </div>
+            </div>
+            <div class="single-form-body">
+                <div class="form-section-title">👤 Candidate Details</div>
+                <div class="form-grid" style="grid-template-columns: 120px 1fr; margin-bottom: 14px;">
+                    <div class="form-group">
+                        <label>Salutation *</label>
+                        <select id="sf-salutation"
+                            style="border: 2px solid #dde3f0; border-radius: 10px; padding: 12px 14px; font-size: 1rem; font-family: 'Times New Roman', Times, serif; color: #000; background: #f8faff; width: 100%;">
+                            <option value="Mr.">Mr. (Male)</option>
+                            <option value="Miss">Miss (Female)</option>
+                            <option value="Mrs.">Mrs.</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name *</label>
+                        <input type="text" id="sf-name" placeholder="e.g. Priya Sharma" autocomplete="name">
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Designation *</label>
+                        <input type="text" id="sf-designation" placeholder="e.g. SMS Operator">
+                    </div>
+                </div>
+                <div class="form-grid full" style="margin-top:14px;">
+                    <div class="form-group">
+                        <label>Full Address *</label>
+                        <input type="text" id="sf-address" placeholder="e.g. 12, MG Road, Patna, Bihar">
+                    </div>
+                </div>
+                <div class="form-grid" style="margin-top:14px;">
+                    <div class="form-group">
+                        <label>Ref No *</label>
+                        <input type="text" id="sf-refno" placeholder="e.g. BSNL/BR/2026-31/05">
+                    </div>
+                    <div class="form-group">
+                        <label>Joining Date *</label>
+                        <input type="date" id="sf-joining">
+                    </div>
+                    <div class="form-group">
+                        <label>Training Date</label>
+                        <input type="date" id="sf-training">
+                    </div>
+                </div>
+
+                <div class="form-section-title" style="margin-top:24px;">💰 Salary Components (Monthly ₹)</div>
+                <div class="salary-grid">
+                    <div class="form-group">
+                        <label>Basic Salary</label>
+                        <input type="number" id="sf-basic" placeholder="0" oninput="sfCalc()" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>HRA</label>
+                        <input type="number" id="sf-hra" placeholder="0" oninput="sfCalc()" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Edu / Conveyance</label>
+                        <input type="number" id="sf-edu" placeholder="0" oninput="sfCalc()" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Special Incentive</label>
+                        <input type="number" id="sf-special" placeholder="0" oninput="sfCalc()" min="0">
+                    </div>
+                </div>
+
+                <!-- Live CTC Preview -->
+                <div class="ctc-preview" id="ctc-preview">
+                    <div class="ctc-row"><span>Gross Monthly (A)</span><span id="prev-gross">₹ 0.00</span></div>
+                    <div class="ctc-row"><span>PF &amp; Statutory Bonus</span><span>₹ 3,083.00</span></div>
+                    <div class="ctc-row"><span>Gratuity Accrual</span><span>₹ 741.00</span></div>
+                    <div class="ctc-row total"><span>Total CTC / Month</span><span id="prev-ctc">₹ 3,824.00</span></div>
+                </div>
+
+                <button class="generate-btn" onclick="generateSingleLetter()">📄 Generate 3-Page Appointment
+                    Letter</button>
+            </div>
+        </div>
+    </div>
+    <!-- ── END SINGLE ENTRY ── -->
+
+    <div id="letters-wrapper">
+        <div id="letters-pool"></div>
+    </div>
+
+    <script>
+        // ── PDF FILENAME & GENDER SETTINGS ──
+        let currentExportName = "Bsnl joining Latter";
+
+        // ── IMAGE PRELOADING FOR PDF RENDERING ──
+        const imageCache = {};
+        const imagesToPreload = [bsnl_base64, auth_base64];
+
+        function preloadImages() {
+            return Promise.all(imagesToPreload.map(src => {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.onload = () => {
+                        imageCache[src] = src;
+                        resolve();
+                    };
+                    img.onerror = () => {
+                        console.warn(`Could not preload ${src}`);
+                        imageCache[src] = src; // Still use local path on error
+                        resolve();
+                    };
+                    img.src = src;
+                });
+            }));
+        }
+
+        // Preload images on page load
+        window.addEventListener('load', preloadImages);
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Set bulk filename
+            currentExportName = "Bsnl joining Latter";
+
+            // Show loading state
+            document.getElementById('loading-overlay').style.display = 'flex';
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setTimeout(() => { // Small delay to let UI show loading
+                    document.getElementById('dashboard-overlay').style.display = 'none';
+                    processCSV(e.target.result);
+                    document.getElementById('loading-overlay').style.display = 'none';
+                    // Wait for images to load before allowing print
+                    setTimeout(() => {
+                        ensureImagesLoaded();
+                    }, 500);
+                }, 500);
+            };
+            reader.readAsText(file);
+        }
+
+        // Ensure all images are loaded before PDF generation
+        function ensureImagesLoaded() {
+            return new Promise((resolve) => {
+                const images = document.querySelectorAll('#letters-pool img');
+                const totalCount = images.length;
+                let loadedCount = 0;
+                let resolved = false;
+
+                const done = () => {
+                    if (resolved) return;
+                    resolved = true;
+                    applyPDFOptimizations();
+                    resolve();
+                };
+
+                if (totalCount === 0) {
+                    done();
+                    return;
+                }
+
+                const checkDone = () => {
+                    if (loadedCount === totalCount) {
+                        done();
+                    }
+                };
+
+                images.forEach(img => {
+                    if (img.complete) {
+                        loadedCount++;
+                        checkDone();
+                    } else {
+                        img.onload = () => {
+                            loadedCount++;
+                            checkDone();
+                        };
+                        img.onerror = () => {
+                            console.warn(`Image failed to load: ${img.src}`);
+                            loadedCount++;
+                            checkDone();
+                        };
+                    }
+                });
+
+                // Fallback if some images never fire load/error events.
+                setTimeout(done, 5000);
+            });
+        }
+
+        // Apply PDF optimization flags
+        function applyPDFOptimizations() {
+            // Ensure print color adjustment is applied
+            const styles = document.styleSheets;
+            for (let i = 0; i < styles.length; i++) {
+                try {
+                    const rules = styles[i].cssRules || styles[i].rules;
+                    if (!rules) continue;
+                    for (let j = 0; j < rules.length; j++) {
+                        const rule = rules[j];
+                        if (rule.media && rule.media.mediaText.includes('print')) {
+                            rule.style.setProperty('-webkit-print-color-adjust', 'exact', 'important');
+                            rule.style.setProperty('print-color-adjust', 'exact', 'important');
+                        }
+                    }
+                } catch (e) {
+                    // Ignore CORS errors
+                }
+            }
+        }
+
+        // Enhanced print function using jsPDF and html2canvas for exact page control
+        async function optimizedPrint() {
+            const element = document.getElementById('letters-pool');
+            if (!element || !element.querySelector('.page-container')) {
+                alert('Please generate the letter first before exporting PDF.');
+                return;
+            }
+
+            // Show loading state
+            document.getElementById('loading-overlay').style.display = 'flex';
+            const loadingText = document.querySelector('#loading-overlay p');
+            if (loadingText) loadingText.innerText = "Generating High-End PDF... Please wait.";
+
+            const html2canvasFn = (typeof window !== 'undefined' && (window.html2canvas || window.Html2Canvas)) || (typeof html2canvas !== 'undefined' ? html2canvas : null);
+            const jsPDFCtor = (typeof window !== 'undefined' && (window.jsPDF || (window.jspdf && window.jspdf.jsPDF))) || (typeof jsPDF !== 'undefined' ? jsPDF : null);
+            const fallbackHtml2pdf = (typeof html2pdf !== 'undefined' ? html2pdf : null) || (typeof window !== 'undefined' && window.html2pdf ? window.html2pdf : null);
+
+            try {
+                await ensureImagesLoaded();
+                await new Promise(resolve => setTimeout(resolve, 500));
+                window.scrollTo(0, 0);
+
+                if (html2canvasFn && jsPDFCtor) {
+                    const pdf = new jsPDFCtor({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    const pages = Array.from(element.querySelectorAll('.page-container'));
+
+                    for (let i = 0; i < pages.length; i++) {
+                        const page = pages[i];
+                        if (i > 0) {
+                            pdf.addPage();
+                        }
+
+                        const canvas = await html2canvasFn(page, {
+                            scale: Math.min(window.devicePixelRatio || 2, 2),
+                            useCORS: true,
+                            logging: false,
+                            backgroundColor: '#ffffff',
+                            scrollY: -window.scrollY,
+                            windowWidth: document.body.scrollWidth,
+                            windowHeight: document.body.scrollHeight
+                        });
+
+                        const imageData = canvas.toDataURL('image/jpeg', 1.0);
+                        pdf.addImage(imageData, 'JPEG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
+                    }
+
+                    pdf.save(currentExportName + '.pdf');
+                } else if (fallbackHtml2pdf) {
+                    const options = {
+                        margin:       [0, 0, 0, 0],
+                        filename:     currentExportName + '.pdf',
+                        image:        { type: 'jpeg', quality: 1 },
+                        html2canvas:  {
+                            scale: Math.min(window.devicePixelRatio || 2, 2),
+                            useCORS: true,
+                            logging: false,
+                            backgroundColor: '#ffffff'
+                        },
+                        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                        pagebreak:    { mode: ['css', 'legacy'], after: '.page-container' }
+                    };
+
+                    await fallbackHtml2pdf().set(options).from(element).save();
+                } else {
+                    throw new Error('Required PDF libraries are not available.');
+                }
+            } catch (err) {
+                console.error("PDF generation error: ", err);
+                const message = err && err.message ? err.message : 'Unknown PDF error.';
+                alert("Error generating PDF: " + message + " Please try again.");
+            } finally {
+                document.getElementById('loading-overlay').style.display = 'none';
+                if (loadingText) loadingText.innerText = "Generating your professional letters";
+            }
+        }
+
+        function processCSV(csvData) {
+            const lines = csvData.split('\n');
+            const rows = lines.map(line => line.trim()).filter(line => line !== '');
+            const wrapper = document.getElementById('letters-pool');
+            wrapper.innerHTML = '';
+
+            // Assuming the first row is a header, start from the second row (index 1)
+            for (let i = 1; i < rows.length; i++) {
+                const cols = rows[i].split(',').map(c => c.trim());
+                if (cols.length < 10) continue; // Ensure basic columns
+
+                let rawName = cols[0];
+                let genderCol = cols[10] ? cols[10].toLowerCase() : ""; // Optional 11th column
+
+                // Smart Salutation Detection/Addition
+                let finalName = rawName;
+                const hasSalutation = /^(Mr\.|Miss|Mrs\.|Ms\.|Shri|Smt\.)/i.test(rawName);
+
+                if (!hasSalutation) {
+                    if (genderCol === "male" || genderCol === "m" || genderCol === "lark" || genderCol === "ladka") {
+                        finalName = "Mr. " + rawName;
+                    } else if (genderCol === "female" || genderCol === "f" || genderCol === "lrki" || genderCol === "ladki") {
+                        finalName = "Miss " + rawName;
+                    }
+                }
+
+                const emp = {
+                    Full_Name: finalName, Address_Full: cols[1], Ref_No: cols[2], Designation: cols[3],
+                    Joining_Date: cols[4], Training_Date: cols[5],
+                    Basic: parseFloat(cols[6]) || 0, HRA: parseFloat(cols[7]) || 0,
+                    Edu: parseFloat(cols[8]) || 0, Conv: parseFloat(cols[9]) || 0,
+                    Special: parseFloat(cols[10]) || 0, // Fallback for special if no gender
+                    Date: cols[4]
+                };
+
+                // Adjust for if Gender column displaced the Special column
+                if (cols.length > 10 && (genderCol === "male" || genderCol === "female" || genderCol === "m" || genderCol === "f")) {
+                    emp.Special = parseFloat(cols[11]) || 0;
+                }
+
+                const gross_monthly = emp.Basic + emp.HRA + emp.Edu + emp.Conv + emp.Special;
+                const pf_x = 1800.0, bonus_x = 1283.0, grat_x = 741.0;
+                const ctc_x = gross_monthly + pf_x + bonus_x + grat_x;
+
+                const header = `
+                    <div class="doc-header">
+                        <div class="bsnl-logo"><img src=${bsnl_base64} alt="BSNL" loading="eager" decoding="sync"></div>
+                        <div class="unit-details">
+                            <h1>BHARAT SANCHAR NIGAM LTD.</h1>
+                            <h2>BSNL TELECOM SERVICE</h2>
+                            <span class="gov-label">(A Govt. of India Telecom)</span>
+                            <span class="gov-sub-label">GOVERNMENT OF TELECOM SERVICES AND NETWORK SOLUTIONS</span>
+                        </div>
+                    </div>`;
+
+                const footerAddress = "SANCHAR PARISAR, BUDH MARG, GPO INCOME TAX GOLMBAR, PATNA, BIHAR - 800001";
+                const watermarkHTML = `<img src=${bsnl_base64} class="watermark" alt="BSNL Watermark" loading="eager" decoding="sync">`;
+                const signatureGridHTML = `
+                    <div class="signature-grid">
+                        <div class="sig-col-left">
+                            <span class="sig-header-text">For, Bharat Sanchar Nigam Limited</span>
+                            <div class="stamp-wrap">
+                                <img src=${auth_base64} alt="Official Seal" loading="eager" decoding="sync">
+                            </div>
+                            <span class="sig-authority-label">(Authorised Signatory)</span>
+                        </div>
+                        <div class="sig-col-right">
+                            <div class="emp-blank-space"></div>
+                            <span class="emp-sig-label">(Employee Signature)</span>
+                        </div>
+                    </div>`;
+
+                wrapper.innerHTML += `
+                    <!-- Page 1 -->
+                    <div class="page-container">
+                        ${watermarkHTML}
+                        <div class="page-content">
+                            ${header}
+                            <div class="meta-line"><div style="font-family: 'Times New Roman', Times, serif; color: #000;">Ref: <strong>${emp.Ref_No}</strong></div><div style="font-family: 'Times New Roman', Times, serif; color: #000; text-align: right; line-height: 1.8;">Joining Date: <strong>${emp.Joining_Date}</strong><br>Training Date: <strong>${emp.Training_Date || '—'}</strong></div></div>
+                            <div>
+                                <p style="font-weight: 800; text-align: left; margin-bottom: 6px; font-family: 'Times New Roman', Times, serif; color: #000;">To,<br><strong>${emp.Full_Name}</strong>,<br>${emp.Address_Full}</p>
+                                <p style="text-align: left; margin-bottom: 6px; font-family: 'Times New Roman', Times, serif; color: #000;">Dear <strong>${emp.Full_Name}</strong>,</p>
+                                <p style="text-align: center; font-weight: bold; text-decoration: underline; margin: 10px 0; color: #003399; font-size: 12pt; font-family: 'Times New Roman', Times, serif;">Sub: Appointment Letter</p>
+                                <p style="font-family: 'Times New Roman', Times, serif; color: #000;">With reference to your application and interview, we are pleased to appoint you as <strong>"${emp.Designation}"</strong> at BSNL with effect from <strong>${emp.Date}</strong>.</p>
+
+                                <p style="margin-top: 8px; margin-bottom: 4px; font-family: 'Times New Roman', Times, serif; color: #000;"><strong>A. COMPENSATION AND BENEFITS</strong></p>
+                                <p style="font-family: 'Times New Roman', Times, serif; color: #000;">Your detailed compensation and benefits structure is mentioned in Annexure 1 attached to this letter.</p>
+                                <p style="margin-top: 8px; margin-bottom: 4px; font-family: 'Times New Roman', Times, serif; color: #000;"><strong>B. GENERAL</strong></p>
+                                <p style="font-family: 'Times New Roman', Times, serif; color: #000;">You will be reporting to <strong>Quality Assurance</strong> department. You are required to sign the enclosed "Agreement of Employment" and return one copy of this letter in token of your acceptance.</p>
+                                <p style="font-family: 'Times New Roman', Times, serif; color: #000;">We look forward to your contributions at BSNL.</p>
+                            </div>
+                            ${signatureGridHTML}
+                        </div>
+                        <footer>
+                            <strong>${footerAddress}</strong>
+                            <span>Phone: +91-612-2541254 | Support: info@bsnl.co.in | portal: www.bsnl.co.in</span>
+                        </footer>
+                    </div>
+
+                    <!-- Page 2 -->
+                    <div class="page-container">
+                        ${watermarkHTML}
+                        <div class="page-content">
+                            ${header}
+                            <div class="meta-line"><div style="font-family: 'Times New Roman', Times, serif; color: #000;">Ref: <strong>${emp.Ref_No}</strong></div><div style="font-family: 'Times New Roman', Times, serif; color: #000;">Date: <strong>${emp.Date}</strong></div></div>
+                            <h2 style="text-align: center; text-decoration: underline; color: #003399; margin: 0 0 10px 0; font-size: 12pt; font-family: 'Times New Roman', Times, serif;">TERMS AND CONDITIONS</h2>
+                            <div>
+                                <p style="margin: 4px 0; font-family: 'Times New Roman', Times, serif; color: #000;"><strong>1. Agreement of Employment:</strong> By accepting this offer, you agree to all terms and conditions mentioned herein.</p>
+                                <p style="margin: 4px 0; font-family: 'Times New Roman', Times, serif; color: #000;"><strong>2. Probation Period:</strong> You will be on a probation period of 5 years.</p>
+                                <div style="margin: 6px 0;">
+                                    <strong style="display: block; margin-bottom: 4px; font-family: 'Times New Roman', Times, serif; color: #000;">3. Working Hours and Leaves:</strong>
+                                    <div style="padding-left: 8mm;">
+                                        <div style="text-align: left; margin: 2px 0; font-family: 'Times New Roman', Times, serif; color: #000;">• <strong>Operational Shifts:</strong> 9:00 AM to 6:00 PM.</div>
+                                        <div style="text-align: left; margin: 2px 0; font-family: 'Times New Roman', Times, serif; color: #000;">• <strong>Rest Days:</strong> 1-2 days per week.</div>
+                                        <div style="text-align: left; margin: 2px 0; font-family: 'Times New Roman', Times, serif; color: #000;">• <strong>Statutory Leaves:</strong> PL, SL, and CL as per policy.</div>
+                                    </div>
+                                </div>
+                                <p style="margin: 4px 0; font-family: 'Times New Roman', Times, serif; color: #000;"><strong>4. Work Execution:</strong> Remote-first approach with eventual on-site requirements.</p>
+                                <p style="margin: 4px 0; font-family: 'Times New Roman', Times, serif; color: #000;"><strong>5. Performance Appraisal:</strong> Eligible for up to 15% annual increment based on goal achievement.</p>
+                                <p style="margin: 4px 0; font-family: 'Times New Roman', Times, serif; color: #000;"><strong>6. Separation:</strong> Separation requires a 30-day notice period or equivalent salary.</p>
+                                <p style="margin: 4px 0; font-family: 'Times New Roman', Times, serif; color: #000;"><strong>7. Confidentiality:</strong> All company data must remain strictly confidential during and after tenure.</p>
+                                <p style="margin: 4px 0; font-family: 'Times New Roman', Times, serif; color: #000;"><strong>8. Training Period:</strong> A comprehensive training period of 4 to 5 days will be provided to familiarize you with company processes and systems.</p>
+                            </div>
+                            ${signatureGridHTML}
+                        </div>
+                        <footer>
+                            <strong>${footerAddress}</strong>
+                            <span>Phone: +91-612-2541254 | Support: info@bsnl.co.in | portal: www.bsnl.co.in</span>
+                        </footer>
+                    </div>
+
+                    <!-- Page 3 -->
+                    <div class="page-container">
+                        ${watermarkHTML}
+                        <div class="page-content">
+                            ${header}
+                            <div class="meta-line"><div style="font-family: 'Times New Roman', Times, serif; color: #000;">Ref: <strong>${emp.Ref_No}</strong></div><div style="font-family: 'Times New Roman', Times, serif; color: #000;">Date: <strong>${emp.Date}</strong></div></div>
+                            <p style="text-align: center; text-decoration: underline; font-weight: bold; margin: 0 0 12px 0; color: #003399; font-size: 12pt; font-family: 'Times New Roman', Times, serif;">Annexure 1 – Compensation Structure</p>
+                            <div>
+                                <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; font-family: 'Times New Roman', Times, serif; font-size: 10.5pt; background: transparent; margin-bottom: 8px; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                                <tr style="background: rgba(241, 245, 249, 0.7); border: 1px solid #000;">
+                                    <th style="padding: 6px; border: 1px solid #000; text-align: left; width: 50%; color: #000; font-family: 'Times New Roman', Times, serif;">Monthly Components</th>
+                                    <th style="padding: 6px; border: 1px solid #000; text-align: right; color: #000; font-family: 'Times New Roman', Times, serif;">Monthly (INR)</th>
+                                    <th style="padding: 6px; border: 1px solid #000; text-align: right; color: #000; font-family: 'Times New Roman', Times, serif;">Annually (INR)</th>
+                                </tr>
+                                <tr style="border: 1px solid #000;">
+                                    <td style="padding: 6px; border: 1px solid #000; color: #000; font-family: 'Times New Roman', Times, serif;">Basic Remuneration</td>
+                                    <td style="padding: 6px; border: 1px solid #000; text-align: right; color: #000; font-family: 'Times New Roman', Times, serif;">${emp.Basic.toFixed(2)}</td>
+                                    <td style="padding: 6px; border: 1px solid #000; text-align: right; color: #000; font-family: 'Times New Roman', Times, serif;">${(emp.Basic * 12).toFixed(2)}</td>
+                                </tr>
+                                <tr style="border: 1px solid #000;">
+                                    <td style="padding: 6px; border: 1px solid #000; color: #000; font-family: 'Times New Roman', Times, serif;">HRA</td>
+                                    <td style="padding: 6px; border: 1px solid #000; text-align: right; color: #000; font-family: 'Times New Roman', Times, serif;">${emp.HRA.toFixed(2)}</td>
+                                    <td style="padding: 6px; border: 1px solid #000; text-align: right; color: #000; font-family: 'Times New Roman', Times, serif;">${(emp.HRA * 12).toFixed(2)}</td>
+                                </tr>
+                                <tr style="border: 1px solid #000;">
+                                    <td style="padding: 6px; border: 1px solid #000; color: #000; font-family: 'Times New Roman', Times, serif;">Educational / Conveyance</td>
+                                    <td style="padding: 6px; border: 1px solid #000; text-align: right; color: #000; font-family: 'Times New Roman', Times, serif;">${(emp.Edu + emp.Conv).toFixed(2)}</td>
+                                    <td style="padding: 6px; border: 1px solid #000; text-align: right; color: #000; font-family: 'Times New Roman', Times, serif;">${((emp.Edu + emp.Conv) * 12).toFixed(2)}</td>
+                                </tr>
+                                <tr style="border: 1px solid #000;">
+                                    <td style="padding: 6px; border: 1px solid #000; color: #000; font-family: 'Times New Roman', Times, serif;">Special Incentive</td>
+                                    <td style="padding: 6px; border: 1px solid #000; text-align: right; color: #000; font-family: 'Times New Roman', Times, serif;">${emp.Special.toFixed(2)}</td>
+                                    <td style="padding: 6px; border: 1px solid #000; text-align: right; color: #000; font-family: 'Times New Roman', Times, serif;">${(emp.Special * 12).toFixed(2)}</td>
+                                </tr>
+                                <tr style="font-weight: bold; background: rgba(226, 232, 240, 0.7); border: 2px solid #000;">
+                                    <td style="padding: 6px; border: 1px solid #000; color: #000; font-family: 'Times New Roman', Times, serif;">Gross Monthly Salary (A)</td>
+                                    <td style="padding: 6px; border: 1px solid #000; text-align: right; color: #000; font-family: 'Times New Roman', Times, serif;">${gross_monthly.toFixed(2)}</td>
+                                    <td style="padding: 6px; border: 1px solid #000; text-align: right; color: #000; font-family: 'Times New Roman', Times, serif;">${(gross_monthly * 12).toFixed(2)}</td>
+                                </tr>
+                                <tr style="background: rgba(250, 250, 250, 0.5); border: 1px solid #000;"><td colspan="3" style="padding: 8px; border: 1px solid #000; color: #000; font-family: 'Times New Roman', Times, serif;"><strong>Statutory & Benefits</strong></td></tr>
+                                <tr style="border: 1px solid #000;">
+                                    <td style="padding: 6px; border: 1px solid #000; color: #000; font-family: 'Times New Roman', Times, serif;">PF & Statutory Bonus</td>
+                                    <td style="padding: 6px; border: 1px solid #000; text-align: right; color: #000; font-family: 'Times New Roman', Times, serif;">${(pf_x + bonus_x).toFixed(2)}</td>
+                                    <td style="padding: 6px; border: 1px solid #000; text-align: right; color: #000; font-family: 'Times New Roman', Times, serif;">${((pf_x + bonus_x) * 12).toFixed(2)}</td>
+                                </tr>
+                                <tr style="border: 1px solid #000;">
+                                    <td style="padding: 6px; border: 1px solid #000; color: #000; font-family: 'Times New Roman', Times, serif;">Gratuity Accrual</td>
+                                    <td style="padding: 6px; border: 1px solid #000; text-align: right; color: #000; font-family: 'Times New Roman', Times, serif;">${grat_x.toFixed(2)}</td>
+                                    <td style="padding: 6px; border: 1px solid #000; text-align: right; color: #000; font-family: 'Times New Roman', Times, serif;">${(grat_x * 12).toFixed(2)}</td>
+                                </tr>
+                                <tr style="font-weight: bold; background: rgba(226, 232, 240, 0.7); border: 2px solid #000;">
+                                    <td style="padding: 6px; border: 1px solid #000; color: #000; font-family: 'Times New Roman', Times, serif;">Total Benefits (B)</td>
+                                    <td style="padding: 6px; border: 1px solid #000; text-align: right; color: #000; font-family: 'Times New Roman', Times, serif;">${(pf_x + bonus_x + grat_x).toFixed(2)}</td>
+                                    <td style="padding: 6px; border: 1px solid #000; text-align: right; color: #000; font-family: 'Times New Roman', Times, serif;">${((pf_x + bonus_x + grat_x) * 12).toFixed(2)}</td>
+                                </tr>
+                                <tr style="font-weight: 900; background: rgba(203, 213, 225, 0.7); border: 2px solid #000;">
+                                    <td style="padding: 6px; border: 1px solid #000; color: #000; font-family: 'Times New Roman', Times, serif;">TOTAL COST TO COMPANY (A + B)</td>
+                                    <td style="padding: 10px; border: 1px solid #000; text-align: right; color: #000; font-family: 'Times New Roman', Times, serif;">${ctc_x.toFixed(2)}</td>
+                                    <td style="padding: 10px; border: 1px solid #000; text-align: right; color: #000; font-family: 'Times New Roman', Times, serif;">${(ctc_x * 12).toFixed(2)}</td>
+                                </tr>
+                            </table>
+                            </div>
+                            ${signatureGridHTML}
+                        </div>
+                        <footer>
+                            <strong>${footerAddress}</strong>
+                            <span>Phone: +91-612-2541254 | Support: info@bsnl.co.in | portal: www.bsnl.co.in</span>
+                        </footer>
+                    </div>
+                    <!-- Pamphlet Pages -->
+                    ${window.pamphletImages && window.pamphletImages[0] ? `
+                    <div class="page-container" style="padding: 0; display: flex; justify-content: center; align-items: center;">
+                        <img src="${window.pamphletImages[0]}" style="max-width: 100%; max-height: 100%; object-fit: contain; -webkit-print-color-adjust: exact; print-color-adjust: exact; image-rendering: high-quality; margin: 0 auto; display: block; border: none; outline: none; box-shadow: none;">
+                    </div>
+                    ` : ''}
+                    ${window.pamphletImages && window.pamphletImages[1] ? `
+                    <div class="page-container" style="padding: 0; display: flex; justify-content: center; align-items: center;">
+                        <img src="${window.pamphletImages[1]}" style="max-width: 100%; max-height: 100%; object-fit: contain; -webkit-print-color-adjust: exact; print-color-adjust: exact; image-rendering: high-quality; margin: 0 auto; display: block; border: none; outline: none; box-shadow: none;">
+                    </div>
+                    ` : ''}`;
+            }
+        }
+
+        // ── SINGLE ENTRY FORM FUNCTIONS ──
+
+        function sfCalc() {
+            const basic = parseFloat(document.getElementById('sf-basic').value) || 0;
+            const hra = parseFloat(document.getElementById('sf-hra').value) || 0;
+            const edu = parseFloat(document.getElementById('sf-edu').value) || 0;
+            const special = parseFloat(document.getElementById('sf-special').value) || 0;
+            const gross = basic + hra + edu + special;
+            const pf_x = 1800.0, bonus_x = 1283.0, grat_x = 741.0;
+            const ctc = gross + pf_x + bonus_x + grat_x;
+            const fmt = v => '₹ ' + v.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+            document.getElementById('prev-gross').textContent = fmt(gross);
+            document.getElementById('prev-ctc').textContent = fmt(ctc);
+        }
+
+        function fmtDate(dateStr) {
+            if (!dateStr) return '—';
+            const d = new Date(dateStr);
+            if (isNaN(d)) return dateStr;
+            return d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
+        }
+
+        function generateSingleLetter() {
+            const salutation = document.getElementById('sf-salutation').value;
+            const name = document.getElementById('sf-name').value.trim();
+            const desig = document.getElementById('sf-designation').value.trim();
+            const address = document.getElementById('sf-address').value.trim();
+            const refno = document.getElementById('sf-refno').value.trim();
+            const joining = document.getElementById('sf-joining').value;
+            const training = document.getElementById('sf-training').value;
+            const basic = parseFloat(document.getElementById('sf-basic').value) || 0;
+            const hra = parseFloat(document.getElementById('sf-hra').value) || 0;
+            const edu = parseFloat(document.getElementById('sf-edu').value) || 0;
+            const special = parseFloat(document.getElementById('sf-special').value) || 0;
+
+            if (!name || !desig || !address || !refno || !joining) {
+                alert('Please fill in all required fields (marked with *).');
+                return;
+            }
+
+            // Update filename for export
+            currentExportName = "Bsnl joining Latter";
+
+            // Clean up name if it already has salutation
+            let finalName = name;
+            const hasSalutation = /^(Mr\.|Miss|Mrs\.|Ms\.)/i.test(name);
+            if (!hasSalutation) {
+                finalName = salutation + " " + name;
+            }
+
+            const emp = {
+                Full_Name: finalName, Address_Full: address, Ref_No: refno, Designation: desig,
+                Joining_Date: fmtDate(joining), Training_Date: fmtDate(training),
+                Basic: basic, HRA: hra, Edu: edu, Conv: 0, Special: special, Date: fmtDate(joining)
+            };
+
+            const gross_monthly = emp.Basic + emp.HRA + emp.Edu + emp.Conv + emp.Special;
+            const pf_x = 1800.0, bonus_x = 1283.0, grat_x = 741.0;
+            const ctc_x = gross_monthly + pf_x + bonus_x + grat_x;
+
+            const footerAddress = "SANCHAR PARISAR, BUDH MARG, GPO INCOME TAX GOLMBAR, PATNA, BIHAR - 800001";
+            const watermarkHTML = `<img src=${bsnl_base64} class="watermark" alt="BSNL Watermark" loading="eager" decoding="sync">`;
+
+            const header = `
+                <div class="doc-header">
+                    <div class="bsnl-logo"><img src=${bsnl_base64} alt="BSNL" loading="eager" decoding="sync"></div>
+                    <div class="unit-details">
+                        <h1>BHARAT SANCHAR NIGAM LTD.</h1>
+                        <h2>BSNL TELECOM SERVICE</h2>
+                        <span class="gov-label">(A Govt. of India Telecom)</span>
+                        <span class="gov-sub-label">GOVERNMENT OF TELECOM SERVICES AND NETWORK SOLUTIONS</span>
+                    </div>
+                </div>`;
+
+            const signatureGridHTML = `
+                <div class="signature-grid">
+                    <div class="sig-col-left">
+                        <span class="sig-header-text">For, Bharat Sanchar Nigam Limited</span>
+                        <div class="stamp-wrap">
+                            <img src=${auth_base64} alt="Official Seal" loading="eager" decoding="sync">
+                        </div>
+                        <span class="sig-authority-label">(Authorised Signatory)</span>
+                    </div>
+                    <div class="sig-col-right">
+                        <div class="emp-blank-space"></div>
+                        <span class="emp-sig-label">(Employee Signature)</span>
+                    </div>
+                </div>`;
+
+            const metaLine = `<div class="meta-line"><div style="font-family:'Times New Roman',Times,serif;color:#000;">Ref: <strong>${emp.Ref_No}</strong></div><div style="font-family:'Times New Roman',Times,serif;color:#000;text-align:right;line-height:1.8;">Joining Date: <strong>${emp.Joining_Date}</strong><br>Training Date: <strong>${emp.Training_Date}</strong></div></div>`;
+
+            const wrapper = document.getElementById('letters-pool');
+            document.getElementById('dashboard-overlay').style.display = 'none';
+            document.getElementById('single-entry-section').style.display = 'none';
+
+            wrapper.innerHTML = `
+                <!-- Page 1 -->
+                <div class="page-container">
+                    ${watermarkHTML}
+                    <div class="page-content">
+                        ${header}
+                        ${metaLine}
+                        <div>
+                            <p style="font-weight:800;text-align:left;margin-bottom:6px;font-family:'Times New Roman',Times,serif;color:#000;">To,<br><strong>${emp.Full_Name}</strong>,<br>${emp.Address_Full}</p>
+                            <p style="text-align:left;margin-bottom:6px;font-family:'Times New Roman',Times,serif;color:#000;">Dear <strong>${emp.Full_Name}</strong>,</p>
+                            <p style="text-align:center;font-weight:bold;text-decoration:underline;margin:10px 0;color:#003399;font-size:12pt;font-family:'Times New Roman',Times,serif;">Sub: Appointment Letter</p>
+                            <p style="font-family:'Times New Roman',Times,serif;color:#000;">With reference to your application and interview, we are pleased to appoint you as <strong>"${emp.Designation}"</strong> at BSNL with effect from <strong>${emp.Joining_Date}</strong>.</p>
+                            <p style="margin-top:8px;margin-bottom:4px;font-family:'Times New Roman',Times,serif;color:#000;"><strong>A. COMPENSATION AND BENEFITS</strong></p>
+                            <p style="font-family:'Times New Roman',Times,serif;color:#000;">Your detailed compensation and benefits structure is mentioned in Annexure 1 attached to this letter.</p>
+                            <p style="margin-top:8px;margin-bottom:4px;font-family:'Times New Roman',Times,serif;color:#000;"><strong>B. GENERAL</strong></p>
+                            <p style="font-family:'Times New Roman',Times,serif;color:#000;">You will be reporting to <strong>Quality Assurance</strong> department. You are required to sign the enclosed "Agreement of Employment" and return one copy of this letter in token of your acceptance.</p>
+                            <p style="font-family:'Times New Roman',Times,serif;color:#000;">We look forward to your contributions at BSNL.</p>
+                        </div>
+                        ${signatureGridHTML}
+                    </div>
+                    <footer><strong>${footerAddress}</strong><span>Phone: +91-612-2541254 | Support: info@bsnl.co.in | portal: www.bsnl.co.in</span></footer>
+                </div>
+
+                <!-- Page 2 -->
+                <div class="page-container">
+                    ${watermarkHTML}
+                    <div class="page-content">
+                        ${header}
+                        ${metaLine}
+                        <h2 style="text-align:center;text-decoration:underline;color:#003399;margin:0 0 10px 0;font-size:12pt;font-family:'Times New Roman',Times,serif;">TERMS AND CONDITIONS</h2>
+                        <div>
+                            <p style="margin:4px 0;font-family:'Times New Roman',Times,serif;color:#000;"><strong>1. Agreement of Employment:</strong> By accepting this offer, you agree to all terms and conditions mentioned herein.</p>
+                            <p style="margin:4px 0;font-family:'Times New Roman',Times,serif;color:#000;"><strong>2. Probation Period:</strong> You will be on a probation period of 5 years.</p>
+                            <div style="margin:6px 0;">
+                                <strong style="display:block;margin-bottom:4px;font-family:'Times New Roman',Times,serif;color:#000;">3. Working Hours and Leaves:</strong>
+                                <div style="padding-left:8mm;">
+                                    <div style="text-align:left;margin:2px 0;font-family:'Times New Roman',Times,serif;color:#000;">• <strong>Operational Shifts:</strong> 9:00 AM to 6:00 PM.</div>
+                                    <div style="text-align:left;margin:2px 0;font-family:'Times New Roman',Times,serif;color:#000;">• <strong>Rest Days:</strong> Sunday Holidays.</div>
+                                    <div style="text-align:left;margin:2px 0;font-family:'Times New Roman',Times,serif;color:#000;">• <strong>Statutory Leaves:</strong> PL, SL, and CL as per policy.</div>
+                                </div>
+                            </div>
+                            <p style="margin:4px 0;font-family:'Times New Roman',Times,serif;color:#000;"><strong>4. Work Execution:</strong> Remote-first approach with eventual on-site requirements.</p>
+                            <p style="margin:4px 0;font-family:'Times New Roman',Times,serif;color:#000;"><strong>5. Performance Appraisal:</strong> Eligible for up to 15% annual increment based on goal achievement.</p>
+                            <p style="margin:4px 0;font-family:'Times New Roman',Times,serif;color:#000;"><strong>6. Separation:</strong> Separation requires a 30-day notice period or equivalent salary.</p>
+                            <p style="margin:4px 0;font-family:'Times New Roman',Times,serif;color:#000;"><strong>7. Confidentiality:</strong> All company data must remain strictly confidential during and after tenure.</p>
+                            <p style="margin:4px 0;font-family:'Times New Roman',Times,serif;color:#000;"><strong>8. Training Period:</strong> A comprehensive training period of 4 to 5 days will be provided to familiarize you with company processes and systems.</p>
+                        </div>
+                        ${signatureGridHTML}
+                    </div>
+                    <footer><strong>${footerAddress}</strong><span>Phone: +91-612-2541254 | Support: info@bsnl.co.in | portal: www.bsnl.co.in</span></footer>
+                </div>
+
+                <!-- Page 3 -->
+                <div class="page-container">
+                    ${watermarkHTML}
+                    <div class="page-content">
+                        ${header}
+                        ${metaLine}
+                        <p style="text-align:center;text-decoration:underline;font-weight:bold;margin:0 0 12px 0;color:#003399;font-size:12pt;font-family:'Times New Roman',Times,serif;">Annexure 1 – Compensation Structure</p>
+                        <div>
+                            <table style="width:100%;border-collapse:collapse;border:1px solid #000;font-family:'Times New Roman',Times,serif;font-size:10.5pt;background:transparent;margin-bottom:8px;-webkit-print-color-adjust:exact;print-color-adjust:exact;">
+                            <tr style="background:rgba(241,245,249,0.7);border:1px solid #000;">
+                                <th style="padding:6px;border:1px solid #000;text-align:left;width:50%;color:#000;font-family:'Times New Roman',Times,serif;">Monthly Components</th>
+                                <th style="padding:6px;border:1px solid #000;text-align:right;color:#000;font-family:'Times New Roman',Times,serif;">Monthly (INR)</th>
+                                <th style="padding:6px;border:1px solid #000;text-align:right;color:#000;font-family:'Times New Roman',Times,serif;">Annually (INR)</th>
+                            </tr>
+                            <tr style="border:1px solid #000;"><td style="padding:6px;border:1px solid #000;color:#000;">Basic Remuneration</td><td style="padding:6px;border:1px solid #000;text-align:right;color:#000;">${emp.Basic.toFixed(2)}</td><td style="padding:6px;border:1px solid #000;text-align:right;color:#000;">${(emp.Basic * 12).toFixed(2)}</td></tr>
+                            <tr style="border:1px solid #000;"><td style="padding:6px;border:1px solid #000;color:#000;">HRA</td><td style="padding:6px;border:1px solid #000;text-align:right;color:#000;">${emp.HRA.toFixed(2)}</td><td style="padding:6px;border:1px solid #000;text-align:right;color:#000;">${(emp.HRA * 12).toFixed(2)}</td></tr>
+                            <tr style="border:1px solid #000;"><td style="padding:6px;border:1px solid #000;color:#000;">Educational / Conveyance</td><td style="padding:6px;border:1px solid #000;text-align:right;color:#000;">${(emp.Edu + emp.Conv).toFixed(2)}</td><td style="padding:6px;border:1px solid #000;text-align:right;color:#000;">${((emp.Edu + emp.Conv) * 12).toFixed(2)}</td></tr>
+                            <tr style="border:1px solid #000;"><td style="padding:6px;border:1px solid #000;color:#000;">Special Incentive</td><td style="padding:6px;border:1px solid #000;text-align:right;color:#000;">${emp.Special.toFixed(2)}</td><td style="padding:6px;border:1px solid #000;text-align:right;color:#000;">${(emp.Special * 12).toFixed(2)}</td></tr>
+                            <tr style="font-weight:bold;background:rgba(226,232,240,0.7);border:2px solid #000;"><td style="padding:6px;border:1px solid #000;color:#000;">Gross Monthly Salary (A)</td><td style="padding:6px;border:1px solid #000;text-align:right;color:#000;">${gross_monthly.toFixed(2)}</td><td style="padding:6px;border:1px solid #000;text-align:right;color:#000;">${(gross_monthly * 12).toFixed(2)}</td></tr>
+                            <tr style="background:rgba(250,250,250,0.5);border:1px solid #000;"><td colspan="3" style="padding:8px;border:1px solid #000;color:#000;"><strong>Statutory &amp; Benefits</strong></td></tr>
+                            <tr style="border:1px solid #000;"><td style="padding:6px;border:1px solid #000;color:#000;">PF &amp; Statutory Bonus</td><td style="padding:6px;border:1px solid #000;text-align:right;color:#000;">${(pf_x + bonus_x).toFixed(2)}</td><td style="padding:6px;border:1px solid #000;text-align:right;color:#000;">${((pf_x + bonus_x) * 12).toFixed(2)}</td></tr>
+                            <tr style="border:1px solid #000;"><td style="padding:6px;border:1px solid #000;color:#000;">Gratuity Accrual</td><td style="padding:6px;border:1px solid #000;text-align:right;color:#000;">${grat_x.toFixed(2)}</td><td style="padding:6px;border:1px solid #000;text-align:right;color:#000;">${(grat_x * 12).toFixed(2)}</td></tr>
+                            <tr style="font-weight:bold;background:rgba(226,232,240,0.7);border:2px solid #000;"><td style="padding:6px;border:1px solid #000;color:#000;">Total Benefits (B)</td><td style="padding:6px;border:1px solid #000;text-align:right;color:#000;">${(pf_x + bonus_x + grat_x).toFixed(2)}</td><td style="padding:6px;border:1px solid #000;text-align:right;color:#000;">${((pf_x + bonus_x + grat_x) * 12).toFixed(2)}</td></tr>
+                            <tr style="font-weight:900;background:rgba(203,213,225,0.7);border:2px solid #000;"><td style="padding:6px;border:1px solid #000;color:#000;">TOTAL COST TO COMPANY (A + B)</td><td style="padding:10px;border:1px solid #000;text-align:right;color:#000;">${ctc_x.toFixed(2)}</td><td style="padding:10px;border:1px solid #000;text-align:right;color:#000;">${(ctc_x * 12).toFixed(2)}</td></tr>
+                            </table>
+                        </div>
+                        ${signatureGridHTML}
+                    </div>
+                    <footer><strong>${footerAddress}</strong><span>Phone: +91-612-2541254 | Support: info@bsnl.co.in | portal: www.bsnl.co.in</span></footer>
+                </div>
+                <!-- Pamphlet Pages -->
+                ${window.pamphletImages && window.pamphletImages[0] ? `
+                <div class="page-container" style="padding: 0; display: flex; justify-content: center; align-items: center;">
+                    <img src="${window.pamphletImages[0]}" style="max-width: 100%; max-height: 100%; object-fit: contain; -webkit-print-color-adjust: exact; print-color-adjust: exact; image-rendering: high-quality; margin: 0 auto; display: block; border: none; outline: none; box-shadow: none;">
+                </div>
+                ` : ''}
+                ${window.pamphletImages && window.pamphletImages[1] ? `
+                <div class="page-container" style="padding: 0; display: flex; justify-content: center; align-items: center;">
+                    <img src="${window.pamphletImages[1]}" style="max-width: 100%; max-height: 100%; object-fit: contain; -webkit-print-color-adjust: exact; print-color-adjust: exact; image-rendering: high-quality; margin: 0 auto; display: block; border: none; outline: none; box-shadow: none;">
+                </div>
+                ` : ''}`;
+
+            setTimeout(() => {
+                ensureImagesLoaded();
+                document.querySelector('#letters-pool').scrollIntoView({ behavior: 'smooth' });
+            }, 200);
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="images_base64.js"></script>
+    <script src="pamphlet_data.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script>
+        window.pamphletImages = [];
+        if (typeof pdfjsLib !== 'undefined' && window.pamphletBase64) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+            const pdfData = atob(window.pamphletBase64);
+            const uint8Array = new Uint8Array(pdfData.length);
+            for (let i = 0; i < pdfData.length; i++) {
+                uint8Array[i] = pdfData.charCodeAt(i);
+            }
+            pdfjsLib.getDocument({data: uint8Array}).promise.then(pdf => {
+                const renderPage = (pageNum) => {
+                    return pdf.getPage(pageNum).then(page => {
+                        const viewport = page.getViewport({scale: 2});
+                        const canvas = document.createElement('canvas');
+                        const context = canvas.getContext('2d');
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+                        return page.render({canvasContext: context, viewport: viewport}).promise.then(() => {
+                            return canvas.toDataURL('image/jpeg', 0.95);
+                        });
+                    });
+                };
+                Promise.all([renderPage(1), renderPage(2)]).then(images => {
+                    window.pamphletImages = images;
+                }).catch(e => console.error('Error rendering pamphlet', e));
+            }).catch(e => console.error('Error loading pamphlet PDF', e));
+        }
+    </script>
+</body>
+
+</html>
